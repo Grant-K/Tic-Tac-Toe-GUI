@@ -16,7 +16,7 @@ public class GUI extends JFrame implements ActionListener
     mnuStartingPlayer = new JMenuItem(" Starting Player"),
     mnuExit = new JMenuItem("    Quit");
 
-    JButton btnEmpty[] = new JButton[26];//
+    JButton btnEmpty[] = new JButton[10];// Edit number to change board size
 
     JPanel  pnlNewGame = new JPanel(),
     pnlNorth = new JPanel(),
@@ -94,9 +94,9 @@ public class GUI extends JFrame implements ActionListener
         mnuStartingPlayer.addActionListener(this);
 
         // setting up the playing field
-        pnlPlayingField.setLayout(new GridLayout(5, 5, 2, 2));//
+        pnlPlayingField.setLayout(new GridLayout(3, 3, 2, 2));// Edit first two numbers to change board size
         pnlPlayingField.setBackground(Color.black);
-        for(int x=1; x <= 25; ++x)   //
+        for(int x=1; x <= 9; ++x)   // Edit the x <= number to change board size
         {
             btnEmpty[x] = new JButton();
             btnEmpty[x].setBackground(new Color(colorR, colorG, colorB));
@@ -122,9 +122,9 @@ public class GUI extends JFrame implements ActionListener
         Object source = click.getSource();
 
         // check if a button was clicked on the gameboard
-        for(int currentMove=1; currentMove <= 25; ++currentMove) //
+        for(int currentMove=1; currentMove <= 9; ++currentMove) // Edit the currentMove <= number to change board size
         {
-            if(source == btnEmpty[currentMove] && remainingMoves < 26)  //
+            if(source == btnEmpty[currentMove] && remainingMoves < 10) // Edit the currentMove <= number to change board size
             {
                 btnEmptyClicked = true;
                 BusinessLogic.GetMove(currentMove, remainingMoves, font, 
@@ -146,7 +146,7 @@ public class GUI extends JFrame implements ActionListener
         // check if the user clicks on a menu item
         if(source == mnuNewGame)    
         {
-            System.out.println(startingPlayer);
+            //System.out.println(startingPlayer);
             BusinessLogic.ClearPanelSouth(pnlSouth,pnlTop,pnlNewGame,
                 pnlPlayingField,pnlBottom,radioPanel);
             if(startingPlayer.equals(""))
@@ -165,7 +165,7 @@ public class GUI extends JFrame implements ActionListener
                     if(option == JOptionPane.YES_OPTION)    
                     {
                         inGame = false;
-                        startingPlayer = "";
+                        //startingPlayer = "";
                         setTableEnabled = false;
                     }
                     else
@@ -255,7 +255,7 @@ public class GUI extends JFrame implements ActionListener
 
         remainingMoves = 1;
 
-        for(int x=1; x <= 25; ++x)   //
+        for(int x=1; x <= 9; ++x) // Edit the x <= number to change board size
         {
             btnEmpty[x].setText("");
             btnEmpty[x].setEnabled(setTableEnabled);
@@ -266,6 +266,74 @@ public class GUI extends JFrame implements ActionListener
 
     private void CheckWin() 
     {   
-        
+        int currentlyConnected = 0;
+        for(int x = 1; x <= 9; x += 3) // Edit the x <= number to change board size
+        {
+            if(btnEmpty[x].getText().equals("$") || btnEmpty[x].getText().equals("&"))
+            {
+                for(int c = 1; c < 3; c++)
+                {
+                    if(x+c <= 9)
+                    {
+                        if((btnEmpty[x].getText()).equals((btnEmpty[x+c].getText())))
+                        {
+                            currentlyConnected++;
+                        }
+                    }
+                }
+                if(currentlyConnected == 2)
+                {
+                    System.out.println(btnEmpty[x].getText() + "'s win!");
+                }
+                currentlyConnected = 0;
+                for(int c = 1; c < 3; c++)
+                {
+                    if(x+(c*3) <= 9)
+                    {
+                        if((btnEmpty[x].getText()).equals((btnEmpty[x+(c*3)].getText())))
+                        {
+                            currentlyConnected++;
+                        }
+                    }
+                }
+                if(currentlyConnected == 2)
+                {
+                    System.out.println(btnEmpty[x].getText() + "'s win!");
+                }
+                currentlyConnected = 0;
+                for(int c = 1; c < 3; c++)
+                {
+                    if(x+(c*3)+c <= 9)
+                    {
+                        if((btnEmpty[x].getText()).equals((btnEmpty[x+(c*3)+c].getText())))
+                        {
+                            currentlyConnected++;
+                        }
+                    }
+                }
+                if(currentlyConnected == 2)
+                {
+                    System.out.println(btnEmpty[x].getText() + "'s win!");
+                }
+                currentlyConnected = 0;
+                for(int c = 1; c < 3; c++)
+                {
+                    if(x+(c*3)-c >= 1 && x+(c*3)-c <= 9)
+                    {
+                        if((btnEmpty[x].getText()).equals((btnEmpty[x+(c*3)-c].getText())))
+                        {
+                            currentlyConnected++;
+                        }
+                    }
+                }
+                System.out.println(currentlyConnected);
+                System.out.println(x);
+                if(currentlyConnected == 2)
+                {
+                    System.out.println(btnEmpty[x].getText() + "'s win!");
+                }
+                currentlyConnected = 0;
+            }
+        }
     }
 }	
