@@ -141,6 +141,15 @@ public class GUI extends JFrame implements ActionListener
             inGame = true;
             CheckWin();
             btnEmptyClicked = false;
+            if(win == true)
+            {
+                inGame = false;
+                startingPlayer = "";
+                radioGroup.clearSelection();
+                setTableEnabled = false;
+                RedrawGameBoard();
+                win = false;
+            }
         }
 
         // check if the user clicks on a menu item
@@ -165,7 +174,8 @@ public class GUI extends JFrame implements ActionListener
                     if(option == JOptionPane.YES_OPTION)    
                     {
                         inGame = false;
-                        //startingPlayer = "";
+                        startingPlayer = "";
+                        radioGroup.clearSelection();
                         setTableEnabled = false;
                     }
                     else
@@ -260,14 +270,13 @@ public class GUI extends JFrame implements ActionListener
             btnEmpty[x].setText("");
             btnEmpty[x].setEnabled(setTableEnabled);
         }
-
-        win = false;        
+     
     }
 
     private void CheckWin() 
     {   
         int currentlyConnected = 0;
-        for(int x = 1; x <= 9; x += 3) // Edit the x <= number to change board size
+        for(int x = 1; x <= 9; x ++) // Edit the x <= number to change board size
         {
             if(btnEmpty[x].getText().equals("$") || btnEmpty[x].getText().equals("&"))
             {
@@ -283,7 +292,9 @@ public class GUI extends JFrame implements ActionListener
                 }
                 if(currentlyConnected == 2)
                 {
+                    JOptionPane.showMessageDialog(null, btnEmpty[x].getText() + "'s win!", "Game Won", JOptionPane.INFORMATION_MESSAGE);
                     System.out.println(btnEmpty[x].getText() + "'s win!");
+                    win = true;
                 }
                 currentlyConnected = 0;
                 for(int c = 1; c < 3; c++)
@@ -298,7 +309,9 @@ public class GUI extends JFrame implements ActionListener
                 }
                 if(currentlyConnected == 2)
                 {
+                    JOptionPane.showMessageDialog(null, btnEmpty[x].getText() + "'s win!", "Game Won", JOptionPane.INFORMATION_MESSAGE);
                     System.out.println(btnEmpty[x].getText() + "'s win!");
+                    win = true;
                 }
                 currentlyConnected = 0;
                 for(int c = 1; c < 3; c++)
@@ -313,7 +326,9 @@ public class GUI extends JFrame implements ActionListener
                 }
                 if(currentlyConnected == 2)
                 {
+                    JOptionPane.showMessageDialog(null, btnEmpty[x].getText() + "'s win!", "Game Won", JOptionPane.INFORMATION_MESSAGE);
                     System.out.println(btnEmpty[x].getText() + "'s win!");
+                    win = true;
                 }
                 currentlyConnected = 0;
                 for(int c = 1; c < 3; c++)
@@ -326,11 +341,11 @@ public class GUI extends JFrame implements ActionListener
                         }
                     }
                 }
-                System.out.println(currentlyConnected);
-                System.out.println(x);
                 if(currentlyConnected == 2)
                 {
+                    JOptionPane.showMessageDialog(null, btnEmpty[x].getText() + "'s win!", "Game Won", JOptionPane.INFORMATION_MESSAGE);
                     System.out.println(btnEmpty[x].getText() + "'s win!");
+                    win = true;
                 }
                 currentlyConnected = 0;
             }
