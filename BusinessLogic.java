@@ -1,36 +1,37 @@
 // ============================================================================
 //     Taken From: http://programmingnotes.org/
 // ============================================================================
+import java.util.ArrayList;
 import javax.swing.*;
 import java.awt.*;
  
 public class BusinessLogic
 {
-	public static void GetMove(int currentMove, int remainingMoves, Font font, JButton btnEmpty[], 
+	public static void GetMove(int currentMove, int remainingMoves, Font font, ArrayList<JButton> btnEmpty, 
 			String startingPlayer)
 	{// gets the current move "X" or "O" for the user & displays to screen
-		btnEmpty[currentMove].setFont(font);
+		btnEmpty.get(currentMove).setFont(font);
  
 		if(startingPlayer.equals("$"))
 		{
 			if(remainingMoves % 2 != 0)
 			{				
-				btnEmpty[currentMove].setText("$");
+				btnEmpty.get(currentMove).setText("$");
 			}
 			else
 			{
-				btnEmpty[currentMove].setText("&");
+				btnEmpty.get(currentMove).setText("&");
 			}
 		}
 		else
 		{
 			if(remainingMoves % 2 != 0)
 			{
-				btnEmpty[currentMove].setText("&");
+				btnEmpty.get(currentMove).setText("&");
 			}
 			else
 			{
-				btnEmpty[currentMove].setText("$");
+				btnEmpty.get(currentMove).setText("$");
 			}
 		}
 	}// End of GetMove

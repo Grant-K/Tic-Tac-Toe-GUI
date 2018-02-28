@@ -1,6 +1,7 @@
 // ============================================================================
 //     Taken From: http://programmingnotes.org/
 // ============================================================================
+import java.util.ArrayList;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
@@ -17,9 +18,7 @@ public class GUI extends JFrame implements ActionListener
     mnuStartingPlayer = new JMenuItem(" Starting Player"),
     mnuExit = new JMenuItem("    Quit");
     int boardSize = 3;
-
-    JButton btnEmpty[] = new JButton[10];// Edit number to change board size
-
+    ArrayList<JButton> btnEmpty = new ArrayList<JButton>();// Edit number to change board size
     JPanel  pnlNewGame = new JPanel(),
     pnlNorth = new JPanel(),
     pnlSouth = new JPanel(),
@@ -101,13 +100,14 @@ public class GUI extends JFrame implements ActionListener
         // setting up the playing field
         pnlPlayingField.setLayout(new GridLayout(3, 3, 2, 2));// Edit first two numbers to change board size
         pnlPlayingField.setBackground(Color.black);
+        btnEmpty.add(new JButton());
         for(int x=1; x <= 9; ++x)   // Edit the x <= number to change board size
         {
-            btnEmpty[x] = new JButton();
-            btnEmpty[x].setBackground(new Color(colorR, colorG, colorB));
-            btnEmpty[x].addActionListener(this);
-            pnlPlayingField.add(btnEmpty[x]);
-            btnEmpty[x].setEnabled(setTableEnabled);
+            btnEmpty.add(new JButton());
+            btnEmpty.get(x).setBackground(new Color(colorR, colorG, colorB));
+            btnEmpty.get(x).addActionListener(this);
+            pnlPlayingField.add(btnEmpty.get(x));
+            btnEmpty.get(x).setEnabled(setTableEnabled);
         }
 
         // adding everything needed to pnlNorth and pnlSouth
@@ -129,12 +129,12 @@ public class GUI extends JFrame implements ActionListener
         // check if a button was clicked on the gameboard
         for(int currentMove=1; currentMove <= (boardSize*boardSize); ++currentMove) // Edit the currentMove <= number to change board size
         {
-            if(source == btnEmpty[currentMove] && remainingMoves < (boardSize*boardSize+1)) // Edit the currentMove <= number to change board size
+            if(source == btnEmpty.get(currentMove) && remainingMoves < (boardSize*boardSize+1)) // Edit the currentMove <= number to change board size
             {
                 btnEmptyClicked = true;
                 BusinessLogic.GetMove(currentMove, remainingMoves, font, 
                     btnEmpty, startingPlayer);              
-                btnEmpty[currentMove].setEnabled(false);
+                btnEmpty.get(currentMove).setEnabled(false);
                 pnlPlayingField.requestFocus();
                 ++remainingMoves;
             }
@@ -211,7 +211,7 @@ public class GUI extends JFrame implements ActionListener
             if(inGame)  
             {
                 JOptionPane.showMessageDialog(null, "Cannot select a new Board "+
-                    "Size at this time.\nFinish the current game, or select a New Game "+
+                    "Size at this time.\nFinish the current game, or select New Game "+
                     "to continue", "Game In Session..", JOptionPane.INFORMATION_MESSAGE);
                 BusinessLogic.ShowGame(pnlSouth,pnlPlayingField);
             }
@@ -221,20 +221,19 @@ public class GUI extends JFrame implements ActionListener
                 while(badInput)
                 {
                     badInput = false;
-                    String boardSizeRaw = JOptionPane.showInputDialog(null, "Please input the desired size of the board (Must be more than 1). Ex. 3 would make a 3x3 board.", "Choose Board Size", JOptionPane.QUESTION_MESSAGE);
+                    String boardSizeRaw = JOptionPane.showInputDialog(null, "Please input the desired size of the board (Must be atleast 3). Ex. 3 would make a 3x3 board.", "Choose Board Size", JOptionPane.QUESTION_MESSAGE);
                     try {
                         boardSize = Integer.parseInt(boardSizeRaw);
                     } catch (NumberFormatException e) {
-                        JOptionPane.showMessageDialog(null, "Board Size must contain only numbers and be more than 1! Please try again!", "Invalid Input", JOptionPane.ERROR_MESSAGE);
+                        JOptionPane.showMessageDialog(null, "Board Size must contain only numbers and be atleast 3! Please try again!", "Invalid Input", JOptionPane.ERROR_MESSAGE);
                         badInput = true;
                     }
                     if(badInput == false && boardSize < 3)
-                        {
-                            JOptionPane.showMessageDialog(null, "Board Size must contain only numbers and be more than 1! Please try again!", "Invalid Input", JOptionPane.ERROR_MESSAGE);
-                            badInput = true;
-                        }
+                    {
+                        JOptionPane.showMessageDialog(null, "Board Size must contain only numbers and be atleast 3! Please try again!", "Invalid Input", JOptionPane.ERROR_MESSAGE);
+                        badInput = true;
+                    }
                 }
-                JButton btnEmpty[] = new JButton[((boardSize*boardSize)+1)];
                 changePlayingBoard();
             }
         }
@@ -244,7 +243,7 @@ public class GUI extends JFrame implements ActionListener
             if(inGame)  
             {
                 JOptionPane.showMessageDialog(null, "Cannot select a new Starting "+
-                    "Player at this time.\nFinish the current game, or select a New Game "+
+                    "Player at this time.\nFinish the current game, or select New Game "+
                     "to continue", "Game In Session..", JOptionPane.INFORMATION_MESSAGE);
                 BusinessLogic.ShowGame(pnlSouth,pnlPlayingField);
             }
@@ -305,8 +304,8 @@ public class GUI extends JFrame implements ActionListener
 
         for(int x=1; x <= (boardSize*boardSize); ++x) // Edit the x <= number to change board size
         {
-            btnEmpty[x].setText("");
-            btnEmpty[x].setEnabled(setTableEnabled);
+            btnEmpty.get(x).setText("");
+            btnEmpty.get(x).setEnabled(setTableEnabled);
         }
 
     }
@@ -317,13 +316,13 @@ public class GUI extends JFrame implements ActionListener
         int trueBoardSize = (boardSize*boardSize);
         for(int x = 1; x <= trueBoardSize; x ++) // Edit the x <= number to change board size
         {
-            if(btnEmpty[x].getText().equals("$") || btnEmpty[x].getText().equals("&"))
+            if(btnEmpty.get(x).getText().equals("$") || btnEmpty.get(x).getText().equals("&"))
             {
                 for(int c = 1; c < boardSize; c++)
                 {
                     if(x+c <= trueBoardSize)
                     {
-                        if((btnEmpty[x].getText()).equals((btnEmpty[x+c].getText())))
+                        if((btnEmpty.get(x).getText()).equals((btnEmpty.get(x+c).getText())))
                         {
                             currentlyConnected++;
                         }
@@ -331,7 +330,7 @@ public class GUI extends JFrame implements ActionListener
                 }
                 if(currentlyConnected == (boardSize-1))
                 {
-                    JOptionPane.showMessageDialog(null, btnEmpty[x].getText() + "'s win!", "Game Won", JOptionPane.INFORMATION_MESSAGE);
+                    JOptionPane.showMessageDialog(null, btnEmpty.get(x).getText() + "'s win!", "Game Won", JOptionPane.INFORMATION_MESSAGE);
                     win = true;
                 }
                 currentlyConnected = 0;
@@ -339,7 +338,7 @@ public class GUI extends JFrame implements ActionListener
                 {
                     if(x+(c*boardSize) <= trueBoardSize)
                     {
-                        if((btnEmpty[x].getText()).equals((btnEmpty[x+(c*boardSize)].getText())))
+                        if((btnEmpty.get(x).getText()).equals((btnEmpty.get(x+(c*boardSize)).getText())))
                         {
                             currentlyConnected++;
                         }
@@ -347,7 +346,7 @@ public class GUI extends JFrame implements ActionListener
                 }
                 if(currentlyConnected == (boardSize-1))
                 {
-                    JOptionPane.showMessageDialog(null, btnEmpty[x].getText() + "'s win!", "Game Won", JOptionPane.INFORMATION_MESSAGE);
+                    JOptionPane.showMessageDialog(null, btnEmpty.get(x).getText() + "'s win!", "Game Won", JOptionPane.INFORMATION_MESSAGE);
                     win = true;
                 }
                 currentlyConnected = 0;
@@ -355,7 +354,7 @@ public class GUI extends JFrame implements ActionListener
                 {
                     if(x+(c*boardSize)+c <= trueBoardSize)
                     {
-                        if((btnEmpty[x].getText()).equals((btnEmpty[x+(c*boardSize)+c].getText())))
+                        if((btnEmpty.get(x).getText()).equals((btnEmpty.get(x+(c*boardSize)+c).getText())))
                         {
                             currentlyConnected++;
                         }
@@ -363,7 +362,7 @@ public class GUI extends JFrame implements ActionListener
                 }
                 if(currentlyConnected == boardSize-1)
                 {
-                    JOptionPane.showMessageDialog(null, btnEmpty[x].getText() + "'s win!", "Game Won", JOptionPane.INFORMATION_MESSAGE);
+                    JOptionPane.showMessageDialog(null, btnEmpty.get(x).getText() + "'s win!", "Game Won", JOptionPane.INFORMATION_MESSAGE);
                     win = true;
                 }
                 currentlyConnected = 0;
@@ -371,7 +370,7 @@ public class GUI extends JFrame implements ActionListener
                 {
                     if(x+(c*boardSize)-c >= 1 && x+(c*boardSize)-c <= trueBoardSize)
                     {
-                        if((btnEmpty[x].getText()).equals((btnEmpty[x+(c*boardSize)-c].getText())))
+                        if((btnEmpty.get(x).getText()).equals((btnEmpty.get(x+(c*boardSize)-c).getText())))
                         {
                             currentlyConnected++;
                         }
@@ -379,25 +378,28 @@ public class GUI extends JFrame implements ActionListener
                 }
                 if(currentlyConnected == (boardSize-1))
                 {
-                    JOptionPane.showMessageDialog(null, btnEmpty[x].getText() + "'s win!", "Game Won", JOptionPane.INFORMATION_MESSAGE);
+                    JOptionPane.showMessageDialog(null, btnEmpty.get(x).getText() + "'s win!", "Game Won", JOptionPane.INFORMATION_MESSAGE);
                     win = true;
                 }
                 currentlyConnected = 0;
             }
         }
     }
-    
+
     private void changePlayingBoard()
     {
+        pnlPlayingField.removeAll();
         pnlPlayingField.setLayout(new GridLayout(boardSize, boardSize, 2, 2));// Edit first two numbers to change board size
         pnlPlayingField.setBackground(Color.black);
+        btnEmpty.clear();
+        btnEmpty.add(new JButton());
         for(int x=1; x <= (boardSize*boardSize); ++x)   // Edit the x <= number to change board size
         {
-            btnEmpty[x] = new JButton();
-            btnEmpty[x].setBackground(new Color(colorR, colorG, colorB));
-            btnEmpty[x].addActionListener(this);
-            pnlPlayingField.add(btnEmpty[x]);
-            btnEmpty[x].setEnabled(setTableEnabled);
+            btnEmpty.add(new JButton());
+            btnEmpty.get(x).setBackground(new Color(colorR, colorG, colorB));
+            btnEmpty.get(x).addActionListener(this);
+            pnlPlayingField.add(btnEmpty.get(x));
+            btnEmpty.get(x).setEnabled(setTableEnabled);
         }
     }
 }	
