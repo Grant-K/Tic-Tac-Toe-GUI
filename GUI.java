@@ -14,6 +14,7 @@ public class GUI extends JFrame implements ActionListener
     JMenuBar mnuMain = new JMenuBar();
     JMenuItem   mnuNewGame = new JMenuItem("  New Game"), 
     mnuBoardSize = new JMenuItem("  Board Size"),
+    mnuPlayers = new JMenuItem("  # of Players"),
     mnuGameTitle = new JMenuItem("|Tic Tac Toe|  "),
     mnuStartingPlayer = new JMenuItem(" Starting Player"),
     mnuExit = new JMenuItem("    Quit");
@@ -39,6 +40,8 @@ public class GUI extends JFrame implements ActionListener
     private String message;
     private Font font = new Font("Rufscript", Font.BOLD, 100);
     private int remainingMoves = 1;
+    private int move = 1;
+    int Players = 1;
 
     //===============================  GUI  ========================================//
     public GUI() //This is the constructor
@@ -77,6 +80,8 @@ public class GUI extends JFrame implements ActionListener
         mnuNewGame.setFont(new Font("Purisa",Font.BOLD,18));
         mnuMain.add(mnuBoardSize);
         mnuBoardSize.setFont(new Font("Purisa",Font.BOLD,18));
+        mnuMain.add(mnuPlayers);
+        mnuPlayers.setFont(new Font("Purisa",Font.BOLD,18));
         mnuMain.add(mnuStartingPlayer);
         mnuStartingPlayer.setFont(new Font("Purisa",Font.BOLD,18));
         mnuMain.add(mnuExit);
@@ -95,6 +100,7 @@ public class GUI extends JFrame implements ActionListener
         mnuNewGame.addActionListener(this);
         mnuExit.addActionListener(this);
         mnuBoardSize.addActionListener(this);
+        mnuPlayers.addActionListener(this);
         mnuStartingPlayer.addActionListener(this);
 
         // setting up the playing field
@@ -155,8 +161,22 @@ public class GUI extends JFrame implements ActionListener
                 RedrawGameBoard();
                 win = false;
             }
-        }
+            /*else
+            {
+                if(Players == 1)
+                {
+                    if(remaingMoves % 2 == 0)
+                    {
+                        
+                    }
+                }
+                else
+                {
 
+                }
+            }
+            */
+        }
         // check if the user clicks on a menu item
         if(source == mnuNewGame)    
         {
@@ -182,6 +202,7 @@ public class GUI extends JFrame implements ActionListener
                         startingPlayer = "";
                         radioGroup.clearSelection();
                         setTableEnabled = false;
+                        move = 1;
                     }
                     else
                     {
@@ -235,6 +256,22 @@ public class GUI extends JFrame implements ActionListener
                     }
                 }
                 changePlayingBoard();
+            }
+        }
+        //Change Amount of Players
+        else if (source == mnuPlayers)
+        {
+            if(inGame)  
+            {
+                JOptionPane.showMessageDialog(null, "Cannot select a new amount of "+
+                    "Players at this time.\nFinish the current game, or select New Game "+
+                    "to continue", "Game In Session..", JOptionPane.INFORMATION_MESSAGE);
+                BusinessLogic.ShowGame(pnlSouth,pnlPlayingField);
+            }
+            else
+            {
+                Object[] possiblePlayers = {1,2};
+                Players = (int)JOptionPane.showInputDialog(null, "Please select the desired amount of players.", "New Player Amount", JOptionPane.PLAIN_MESSAGE, null, possiblePlayers,possiblePlayers[0]);
             }
         }
         // select X or O player 
@@ -384,6 +421,85 @@ public class GUI extends JFrame implements ActionListener
                 currentlyConnected = 0;
             }
         }
+    }
+
+    private int canWin()
+    {
+        int currentlyConnected = 0;
+        int winMovePos = -1;
+        int trueBoardSize = (boardSize*boardSize);
+        for(int i = 0; i < trueBoardSize; i += boardSize)
+        {
+            for(int c = i; c < boardSize*((i + boardSize)/boardSize); c++)
+            {
+                for(int ci = 1; ci < boardSize; ci++)
+                {
+                    if((c + ci) <= i + boardSize - 1)
+                    {
+                        if((btnEmpty.get(c).getText()).equals((btnEmpty.get(c+ci).getText())))
+                            currentlyConnected++;
+                        else
+                            winMovePos = (c + ci);
+                    }
+                }
+                if(currentlyConnected == boardSize - 2 && winMovePos > -1 && ((btnEmpty.get(winMovePos).getText()).equals("$") == false) && ((btnEmpty.get(winMovePos).getText()).equals("&") == false))
+                {
+                    return winMovePos;
+                }
+                currentlyConnected = 0;
+                winMovePos = -1;
+                for(int ci = 1; ci < boardSize; ci++)
+                {
+                    if((c + boardSize*ci) <= i + boardSize*ci + boardSize - 1 && i + boardSize*ci + boardSize - 1 < trueBoardSize)
+                    {
+                        if((btnEmpty.get(c).getText()).equals((btnEmpty.get(c + boardSize*ci).getText())))
+                            currentlyConnected++;
+                        else
+                            winMovePos = (c + boardSize*ci);
+                    }
+                }
+                System.out.println("Currently Connected " + currentlyConnected);
+                if(currentlyConnected == boardSize - 2 && winMovePos > -1 && ((btnEmpty.get(winMovePos).getText()).equals("$") == false) && ((btnEmpty.get(winMovePos).getText()).equals("&") == false))
+                {
+                    return winMovePos;
+                }
+                currentlyConnected = 0;
+                winMovePos = -1;
+                for(int ci = 1; ci < boardSize; ci++)
+                {
+                    if((c + boardSize*ci + ci) < trueBoardSize)
+                    {
+                        if((btnEmpty.get(c).getText()).equals((btnEmpty.get(c + boardSize*ci + ci).getText())))
+                            currentlyConnected++;
+                        else
+                            winMovePos = (c + boardSize*ci + ci);
+                    }
+                }
+                if(currentlyConnected == boardSize - 2 && winMovePos > -1 && ((btnEmpty.get(winMovePos).getText()).equals("$") == false) && ((btnEmpty.get(winMovePos).getText()).equals("&") == false))
+                {
+                    return winMovePos;
+                }
+                currentlyConnected = 0;
+                winMovePos = -1;
+                for(int ci = 1; ci < boardSize; ci++)
+                {
+                    if((c + boardSize*ci - ci) >= i + boardSize*ci && i + boardSize*ci < trueBoardSize)
+                    {
+                        if((btnEmpty.get(c).getText()).equals((btnEmpty.get(c + boardSize*ci - ci).getText())))
+                            currentlyConnected++;
+                        else
+                            winMovePos = (c + boardSize*ci - ci);
+                    }
+                }
+                if(currentlyConnected == boardSize - 2 && winMovePos > -1 && ((btnEmpty.get(winMovePos).getText()).equals("$") == false) && ((btnEmpty.get(winMovePos).getText()).equals("&") == false))
+                {
+                    return winMovePos;
+                }
+                currentlyConnected = 0;
+                winMovePos = -1;
+            }
+        }
+        return -1;
     }
 
     private void changePlayingBoard()
