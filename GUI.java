@@ -142,7 +142,7 @@ public class GUI extends JFrame implements ActionListener
                     btnEmpty, startingPlayer);              
                 btnEmpty.get(currentMove).setEnabled(false);
                 pnlPlayingField.requestFocus();
-                ++remainingMoves;
+                remainingMoves++;
             }
         }
 
@@ -161,21 +161,33 @@ public class GUI extends JFrame implements ActionListener
                 RedrawGameBoard();
                 win = false;
             }
-            /*else
+            else if (remainingMoves > (boardSize*boardSize))
             {
-                if(Players == 1)
-                {
-                    if(remaingMoves % 2 == 0)
-                    {
-                        
-                    }
-                }
-                else
-                {
-
-                }
+                JOptionPane.showMessageDialog(null, "Cats Game!", "Game Won", JOptionPane.INFORMATION_MESSAGE);
+                win = true;
             }
-            */
+            else if(Players == 1 && remainingMoves % 2 == 0)
+            {
+                System.out.println("Finding move for bot");
+                int botMove = ((int)Math.random() * (boardSize*boardSize))+1;
+                if(canWin() >= 0)
+                {
+                    System.out.println("Someone can win!");
+                    botMove = canWin();
+                    System.out.println(botMove);
+                }
+                while((btnEmpty.get(botMove).getText()).equals("$") || (btnEmpty.get(botMove).getText()).equals("&"))
+                {
+                    System.out.println("In finding new spot loop");
+                    botMove = ((int)(Math.random() * (boardSize*boardSize))+1);
+                }
+                System.out.println(botMove);
+                BusinessLogic.GetMove(botMove, remainingMoves, font, btnEmpty, startingPlayer);      
+                btnEmpty.get(botMove).setEnabled(false);
+                pnlPlayingField.requestFocus();
+                remainingMoves++;
+                CheckWin();
+            }
         }
         // check if the user clicks on a menu item
         if(source == mnuNewGame)    
@@ -351,13 +363,13 @@ public class GUI extends JFrame implements ActionListener
     {   
         int currentlyConnected = 0;
         int trueBoardSize = (boardSize*boardSize);
-        for(int x = 1; x <= trueBoardSize; x ++) // Edit the x <= number to change board size
+        for(int x = 1; x <= trueBoardSize; x += boardSize)
         {
             if(btnEmpty.get(x).getText().equals("$") || btnEmpty.get(x).getText().equals("&"))
             {
                 for(int c = 1; c < boardSize; c++)
                 {
-                    if(x+c <= trueBoardSize)
+                    if(x+c < (x+boardSize))
                     {
                         if((btnEmpty.get(x).getText()).equals((btnEmpty.get(x+c).getText())))
                         {
@@ -365,12 +377,18 @@ public class GUI extends JFrame implements ActionListener
                         }
                     }
                 }
-                if(currentlyConnected == (boardSize-1))
+                if(currentlyConnected == boardSize-1)
                 {
                     JOptionPane.showMessageDialog(null, btnEmpty.get(x).getText() + "'s win!", "Game Won", JOptionPane.INFORMATION_MESSAGE);
                     win = true;
                 }
                 currentlyConnected = 0;
+            }
+        }
+        for(int x = 1; x <= trueBoardSize; x++) // Edit the x <= number to change board size
+        {
+            if(btnEmpty.get(x).getText().equals("$") || btnEmpty.get(x).getText().equals("&"))
+            {
                 for(int c = 1; c < boardSize; c++)
                 {
                     if(x+(c*boardSize) <= trueBoardSize)
@@ -381,7 +399,7 @@ public class GUI extends JFrame implements ActionListener
                         }
                     }
                 }
-                if(currentlyConnected == (boardSize-1))
+                if(currentlyConnected == boardSize-1)
                 {
                     JOptionPane.showMessageDialog(null, btnEmpty.get(x).getText() + "'s win!", "Game Won", JOptionPane.INFORMATION_MESSAGE);
                     win = true;
@@ -405,7 +423,7 @@ public class GUI extends JFrame implements ActionListener
                 currentlyConnected = 0;
                 for(int c = 1; c < boardSize; c++)
                 {
-                    if(x+(c*boardSize)-c >= 1 && x+(c*boardSize)-c <= trueBoardSize)
+                    if(x+(c*boardSize)-c >= 1 && x+(c*boardSize) <= trueBoardSize && x+(c*boardSize)-c >= (c*boardSize))
                     {
                         if((btnEmpty.get(x).getText()).equals((btnEmpty.get(x+(c*boardSize)-c).getText())))
                         {
@@ -413,7 +431,7 @@ public class GUI extends JFrame implements ActionListener
                         }
                     }
                 }
-                if(currentlyConnected == (boardSize-1))
+                if(currentlyConnected == boardSize-1)
                 {
                     JOptionPane.showMessageDialog(null, btnEmpty.get(x).getText() + "'s win!", "Game Won", JOptionPane.INFORMATION_MESSAGE);
                     win = true;
@@ -426,20 +444,24 @@ public class GUI extends JFrame implements ActionListener
     private int canWin()
     {
         int currentlyConnected = 0;
-        int winMovePos = -1;
         int trueBoardSize = (boardSize*boardSize);
-        for(int i = 0; i < trueBoardSize; i += boardSize)
+        int winMovePos = -1;
+        for(int x = 1; x <= trueBoardSize; x += boardSize) // Edit the x <= number to change board size
         {
-            for(int c = i; c < boardSize*((i + boardSize)/boardSize); c++)
+            if(btnEmpty.get(x).getText().equals("$") || btnEmpty.get(x).getText().equals("&"))
             {
-                for(int ci = 1; ci < boardSize; ci++)
+                for(int c = 1; c <= boardSize; c++)
                 {
-                    if((c + ci) <= i + boardSize - 1)
+                    if(x+c < (x+boardSize))
                     {
-                        if((btnEmpty.get(c).getText()).equals((btnEmpty.get(c+ci).getText())))
+                        if((btnEmpty.get(x).getText()).equals((btnEmpty.get(x+c).getText())))
+                        {
                             currentlyConnected++;
+                        }
                         else
-                            winMovePos = (c + ci);
+                        {
+                            winMovePos = x+c;
+                        }
                     }
                 }
                 if(currentlyConnected == boardSize - 2 && winMovePos > -1 && ((btnEmpty.get(winMovePos).getText()).equals("$") == false) && ((btnEmpty.get(winMovePos).getText()).equals("&") == false))
@@ -448,31 +470,24 @@ public class GUI extends JFrame implements ActionListener
                 }
                 currentlyConnected = 0;
                 winMovePos = -1;
-                for(int ci = 1; ci < boardSize; ci++)
+            }
+        }
+        for(int x = 1; x <= trueBoardSize; x++)
+        {
+            if(btnEmpty.get(x).getText().equals("$") || btnEmpty.get(x).getText().equals("&"))
+            {
+                for(int c = 1; c <= boardSize; c++)
                 {
-                    if((c + boardSize*ci) <= i + boardSize*ci + boardSize - 1 && i + boardSize*ci + boardSize - 1 < trueBoardSize)
+                    if(x+(c*boardSize) <= trueBoardSize)
                     {
-                        if((btnEmpty.get(c).getText()).equals((btnEmpty.get(c + boardSize*ci).getText())))
+                        if((btnEmpty.get(x).getText()).equals((btnEmpty.get(x+(c*boardSize)).getText())))
+                        {
                             currentlyConnected++;
+                        }
                         else
-                            winMovePos = (c + boardSize*ci);
-                    }
-                }
-                System.out.println("Currently Connected " + currentlyConnected);
-                if(currentlyConnected == boardSize - 2 && winMovePos > -1 && ((btnEmpty.get(winMovePos).getText()).equals("$") == false) && ((btnEmpty.get(winMovePos).getText()).equals("&") == false))
-                {
-                    return winMovePos;
-                }
-                currentlyConnected = 0;
-                winMovePos = -1;
-                for(int ci = 1; ci < boardSize; ci++)
-                {
-                    if((c + boardSize*ci + ci) < trueBoardSize)
-                    {
-                        if((btnEmpty.get(c).getText()).equals((btnEmpty.get(c + boardSize*ci + ci).getText())))
-                            currentlyConnected++;
-                        else
-                            winMovePos = (c + boardSize*ci + ci);
+                        {
+                            winMovePos = x+(c*boardSize);
+                        }
                     }
                 }
                 if(currentlyConnected == boardSize - 2 && winMovePos > -1 && ((btnEmpty.get(winMovePos).getText()).equals("$") == false) && ((btnEmpty.get(winMovePos).getText()).equals("&") == false))
@@ -481,14 +496,38 @@ public class GUI extends JFrame implements ActionListener
                 }
                 currentlyConnected = 0;
                 winMovePos = -1;
-                for(int ci = 1; ci < boardSize; ci++)
+                for(int c = 1; c <= boardSize; c++)
                 {
-                    if((c + boardSize*ci - ci) >= i + boardSize*ci && i + boardSize*ci < trueBoardSize)
+                    if(x+(c*boardSize)+c <= trueBoardSize)
                     {
-                        if((btnEmpty.get(c).getText()).equals((btnEmpty.get(c + boardSize*ci - ci).getText())))
+                        if((btnEmpty.get(x).getText()).equals((btnEmpty.get(x+(c*boardSize)+c).getText())))
+                        {
                             currentlyConnected++;
+                        }
                         else
-                            winMovePos = (c + boardSize*ci - ci);
+                        {
+                            winMovePos = x+(c*boardSize)+c;
+                        }
+                    }
+                }
+                if(currentlyConnected == boardSize - 2 && winMovePos > -1 && ((btnEmpty.get(winMovePos).getText()).equals("$") == false) && ((btnEmpty.get(winMovePos).getText()).equals("&") == false))
+                {
+                    return winMovePos;
+                }
+                currentlyConnected = 0;
+                winMovePos = -1;
+                for(int c = 1; c <= boardSize; c++)
+                {
+                    if(x+(c*boardSize)-c >= 1 && x+(c*boardSize) <= trueBoardSize && x+(c*boardSize)-c >= (c*boardSize))
+                    {
+                        if((btnEmpty.get(x).getText()).equals((btnEmpty.get(x+(c*boardSize)-c).getText())))
+                        {
+                            currentlyConnected++;
+                        }
+                        else
+                        {
+                            winMovePos = x+(c*boardSize)-c;
+                        }
                     }
                 }
                 if(currentlyConnected == boardSize - 2 && winMovePos > -1 && ((btnEmpty.get(winMovePos).getText()).equals("$") == false) && ((btnEmpty.get(winMovePos).getText()).equals("&") == false))
